@@ -9,6 +9,16 @@ The current implementation is JVM-only and focuses on the conversion pipeline. F
 - Java
 - Clojure CLI / `clj`
 
+## Development
+
+Run the linter:
+
+```bash
+clj -M:lint
+```
+
+This repo includes a local pre-commit hook that runs the same command. The tracked hook template lives at `scripts/hooks/pre-commit`.
+
 ## Run
 
 Convert PDFs from `inbox/` into Markdown files in `out_md/` and renamed receipt PDFs in `out_pdf/`:

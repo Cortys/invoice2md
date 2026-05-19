@@ -5,4 +5,6 @@
         clj-commons/clj-yaml {:mvn/version "1.0.29"}
         selmer/selmer {:mvn/version "1.12.70"}}
  :aliases
- {:run {:main-opts ["-m" "invoice2md.core"]}}}
+ {:run {:main-opts ["-m" "invoice2md.core"]}
+  :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2026.04.15"}}
+         :main-opts ["-m" "clj-kondo.main" "--lint" "src"]}}}
