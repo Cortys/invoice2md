@@ -1,0 +1,17 @@
+.cpcache/
+.nrepl-port
+.portal/
+.lsp/
+.clj-kondo/.cache/
+
+target/
+classes/
+*.jar
+*.class
+
+.DS_Store
+Thumbs.db
+
+inbox
+out_md
+out_pdf
