@@ -19,9 +19,9 @@
   (.mkdirs (io/file dir)))
 
 (defn target-paths
-  [{:keys [markdown-dir receipt-dir basename]}]
-  {:markdown-path (io/file markdown-dir (str basename ".md"))
-   :receipt-path (io/file receipt-dir (str basename ".pdf"))})
+  [{:keys [markdown-dir receipt-dir markdown-basename pdf-basename]}]
+  {:markdown-path (io/file markdown-dir (str markdown-basename ".md"))
+   :receipt-path (io/file receipt-dir (str pdf-basename ".pdf"))})
 
 (defn copy-file!
   [source target overwrite?]

@@ -7,20 +7,31 @@
 
 (defn- conversion-context
   [config pdf-file]
-  (let [text (pdf/extract-text pdf-file)
-        fields (extract/extract-fields text (:fields config))]
+  (let [sources (pdf/extract-sources pdf-file)
+        fields (extract/extract-fields sources (:fields config))]
     (merge fields (:static config) {:source_pdf (.getPath pdf-file)})))
+
+(defn- filename-template
+  [config key]
+  (or (get config key) (:filename config)))
 
 (defn- planned-conversion
   [config opts pdf-file]
   (let [context (conversion-context config pdf-file)
-        basename (render/render-basename (:filename config) context)
-        context (assoc context :basename basename)
+        markdown-basename (render/render-basename (filename-template config :markdown_filename) context)
+        pdf-basename (render/render-basename (filename-template config :pdf_filename) context)
+        context (assoc context
+                       :basename markdown-basename
+                       :markdown_basename markdown-basename
+                       :pdf_basename pdf-basename)
         targets (paths/target-paths {:markdown-dir (:markdown-dir opts)
-                                     :receipt-dir (:receipt-dir opts)
-                                     :basename basename})]
+                                      :receipt-dir (:receipt-dir opts)
+                                      :markdown-basename markdown-basename
+                                      :pdf-basename pdf-basename})]
     (merge {:source-pdf pdf-file
-            :basename basename
+            :basename markdown-basename
+            :markdown-basename markdown-basename
+            :pdf-basename pdf-basename
             :context context
             :markdown (render/render-markdown (:markdown config) context)}
            targets)))

@@ -73,11 +73,18 @@ fields:
     group: 1
 
   invoice_date:
-    regex: "Date:\\s+(\\d{2}\\.\\d{2}\\.\\d{4})"
-    group: 1
     type: date
-    input_format: dd.MM.yyyy
     output_format: yyyy-MM-dd
+    stages:
+      - target: metadata
+        metadata_key: keywords
+        regex: "invoice-date=(\\d{4}-\\d{2}-\\d{2})"
+        group: 1
+        input_format: yyyy-MM-dd
+      - target: content
+        regex: "Date:\\s+(\\d{2}\\.\\d{2}\\.\\d{4})"
+        group: 1
+        input_format: dd.MM.yyyy
 
   cost:
     regex: "Total:\\s+([0-9]+,[0-9]{2} €)"
@@ -88,12 +95,13 @@ static:
   tags:
     - expense
 
-filename: "{{invoice_date}} Example Invoice {{invoice_number}}"
+markdown_filename: "{{invoice_date}} Example Invoice {{invoice_number}}"
+pdf_filename: "{{invoice_date}} Example Receipt {{invoice_number}}"
 
 markdown: |
   ---
   name: Example Invoice {{invoice_number}}
-  receipt: "[[{{basename}}.pdf]]"
+  receipt: "[[{{pdf_basename}}.pdf]]"
   cost: {{cost}}
   date: {{invoice_date}}
   issuer: {{issuer}}
@@ -105,23 +113,44 @@ markdown: |
 
 ### Field Rules
 
-Each field under `fields` extracts one value from the PDF text.
+Each field under `fields` extracts one value. By default, regexes are applied to the extracted PDF text.
 
-- `regex`: Java regular expression applied to the extracted PDF text.
+- `regex`: Java regular expression applied to the selected extraction target.
 - `group`: capture group to use, usually `1`.
 - `type: date`: optional date coercion.
 - `input_format`: Java `DateTimeFormatter` pattern for parsed dates.
 - `output_format`: Java `DateTimeFormatter` pattern for rendered dates.
+- `target`: extraction target. Defaults to `content`; use `metadata` for PDF metadata.
+- `metadata_key`: metadata field to read when `target: metadata`, for example `keywords`.
+
+For multi-stage extraction, add `stages`. Stages are tried in order and the first matching value is used:
+
+```yaml
+invoice_date:
+  type: date
+  output_format: yyyy-MM-dd
+  stages:
+    - target: metadata
+      metadata_key: keywords
+      regex: "invoice-date=(\\d{4}-\\d{2}-\\d{2})"
+      group: 1
+      input_format: yyyy-MM-dd
+    - regex: "Date:\\s+(\\d{2}\\.\\d{2}\\.\\d{4})"
+      group: 1
+      input_format: dd.MM.yyyy
+```
+
+If a field has no `stages` key, the field itself is treated as a single stage. When a stage has no `target`, it defaults to `content`.
 
 Values under `static` are copied directly into the render context.
 
 ### Templates
 
-`filename` and `markdown` are Selmer templates. Extracted fields, static values, and `basename` are available as template variables.
+`markdown_filename`, `pdf_filename`, and `markdown` are Selmer templates. Extracted fields, static values, `markdown_basename`, `pdf_basename`, and `basename` are available as template variables. `basename` is the same as `markdown_basename` for simple existing templates.
 
 The generated paths are:
 
-- Markdown: `<markdown-dir>/<basename>.md`
-- Receipt PDF: `<receipt-dir>/<basename>.pdf`
+- Markdown: `<markdown-dir>/<markdown_basename>.md`
+- Receipt PDF: `<receipt-dir>/<pdf_basename>.pdf`
 
-The source PDF name is not trusted. The output PDF is always named from the rendered `filename` template.
+The source PDF name is not trusted. Output files are named from the rendered filename templates. For simple configs, `filename` can be used as a fallback for both `markdown_filename` and `pdf_filename`.
