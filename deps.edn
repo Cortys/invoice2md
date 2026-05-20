@@ -6,5 +6,7 @@
         selmer/selmer {:mvn/version "1.12.70"}}
  :aliases
  {:run {:main-opts ["-m" "invoice2md.core"]}
+  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.10"}}
+          :ns-default build}
   :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2026.04.15"}}
-         :main-opts ["-m" "clj-kondo.main" "--lint" "src"]}}}
+          :main-opts ["-m" "clj-kondo.main" "--lint" "src"]}}}

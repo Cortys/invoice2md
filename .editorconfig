@@ -10,3 +10,6 @@ trim_trailing_whitespace = true
 
 [*.clj]
 indent_size = 1
+
+[VERSION]
+insert_final_newline = false

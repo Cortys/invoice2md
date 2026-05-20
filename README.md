@@ -17,7 +17,43 @@ Run the linter:
 clj -M:lint
 ```
 
+Build an uberjar:
+
+```bash
+clj -T:build uber
+```
+
 This repo includes a local pre-commit hook that runs the same command. The tracked hook template lives at `scripts/hooks/pre-commit`.
+
+Install the hook into this checkout:
+
+```bash
+./scripts/install-pre-commit.sh
+```
+
+On Windows:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-pre-commit.ps1
+```
+
+## Install
+
+On Linux or macOS, install the app for the current user:
+
+```bash
+./scripts/install.sh
+```
+
+The installer builds the uberjar, copies it to `~/.local/share/invoice2md`, and creates an `invoice2md` launcher in `~/.local/bin`. Make sure `~/.local/bin` is on `PATH`, then run `invoice2md convert ...` from any directory.
+
+On Windows, install the app for the current user:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1
+```
+
+The installer builds the uberjar, copies it to `%USERPROFILE%\.invoice2md`, creates an `invoice2md.cmd` launcher, and adds `%USERPROFILE%\.invoice2md\bin` to the user `PATH`. Open a new terminal afterwards, then run `invoice2md convert ...` from any directory.
 
 ## Run
 

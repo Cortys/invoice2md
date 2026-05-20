@@ -17,7 +17,7 @@
   [summary]
   (str/join
    \newline
-   ["Usage: clj -M:run convert --config CONFIG --pdf-dir DIR --markdown-dir DIR --receipt-dir DIR"
+    ["Usage: invoice2md convert --config CONFIG --pdf-dir DIR --markdown-dir DIR --receipt-dir DIR"
     ""
     "Options:"
     summary]))
@@ -73,7 +73,7 @@
       "convert" (convert-command command-args)
       (do
         (binding [*out* *err*]
-          (println "Usage: clj -M:run <command>")
+          (println "Usage: invoice2md <command>")
           (println)
           (println "Commands:")
           (println "  convert"))
