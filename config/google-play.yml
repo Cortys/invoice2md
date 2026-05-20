@@ -1,0 +1,47 @@
+profile: google-play
+
+defaults:
+  overwrite: false
+
+fields:
+  name:
+    regex: "(?s)Transaktions-ID\\s+Beschreibung\\s+Menge\\s+Betrag \\(€\\)\\s+\\S+\\s+(.+?)\\s+\\d+\\s+[0-9]+,[0-9]{2}"
+    group: 1
+
+  invoice_date:
+    type: date
+    output_format: yyyy-MM-dd
+    stages:
+      - regex: "(?s)Gesamtsumme in EUR\\s+(\\d{1,2}\\.\\s+[A-Za-zÄÖÜäöüß]+\\s+\\d{4})\\s+Transaktions-ID"
+        group: 1
+        input_format: d. MMMM yyyy
+      - regex: "(?s)Gesamtsumme in EUR\\s+(\\d{1,2}\\.\\s+[A-Za-zÄÖÜäöüß]+\\.?\\s+\\d{4})\\s+Transaktions-ID"
+        group: 1
+        input_format: d. MMM yyyy
+
+  cost:
+    regex: "(?s)Details.*?([0-9]+,[0-9]{2})\\S*\\s+Google Play Apps\\s+Gesamtsumme in EUR"
+    group: 1
+
+static:
+  expense_type: "Software"
+  issuer: "Google"
+  tags:
+    - expense
+    - work
+
+markdown_filename: "{{invoice_date}} {{name}}"
+pdf_filename: "{{invoice_date}} {{name}}"
+
+markdown: |
+  ---
+  name: {{name}}
+  receipt: "[[{{pdf_basename}}.pdf]]"
+  cost: {{cost}} €
+  date: {{invoice_date}}
+  expense-type: {{expense_type}}
+  issuer: {{issuer}}
+  tags:
+  {% for tag in tags %}  - {{tag}}
+  {% endfor %}
+  ---
