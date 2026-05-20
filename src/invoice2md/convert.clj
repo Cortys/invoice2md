@@ -7,9 +7,21 @@
 
 (defn- conversion-context
   [config pdf-file]
-  (let [sources (pdf/extract-sources pdf-file)
-        fields (extract/extract-fields sources (:fields config))]
-    (merge fields (:static config) {:source_pdf (.getPath pdf-file)})))
+  (let [sources (try
+                  (pdf/extract-sources pdf-file)
+                  (catch Exception e
+                    (throw (ex-info (str "Could not read PDF: " (.getPath pdf-file))
+                                    {:source-pdf pdf-file}
+                                    e))))
+        fields (try
+                 (extract/extract-fields sources (:fields config))
+                 (catch Exception e
+                   (throw (ex-info (str "Could not extract fields from PDF: " (.getPath pdf-file))
+                                   {:source-pdf pdf-file
+                                    :pdf-sources sources}
+                                   e))))]
+    {:context (merge fields (:static config) {:source_pdf (.getPath pdf-file)})
+     :extracted-fields fields}))
 
 (defn- filename-template
   [config key]
@@ -17,7 +29,7 @@
 
 (defn- planned-conversion
   [config opts pdf-file]
-  (let [context (conversion-context config pdf-file)
+  (let [{:keys [context extracted-fields]} (conversion-context config pdf-file)
         markdown-basename (render/render-basename (filename-template config :markdown_filename) context)
         pdf-basename (render/render-basename (filename-template config :pdf_filename) context)
         context (assoc context
@@ -32,6 +44,7 @@
             :basename markdown-basename
             :markdown-basename markdown-basename
             :pdf-basename pdf-basename
+            :extracted-fields extracted-fields
             :context context
             :markdown (render/render-markdown (:markdown config) context)}
            targets)))
@@ -64,4 +77,11 @@
   [config opts]
   (paths/ensure-dir! (:markdown-dir opts))
   (paths/ensure-dir! (:receipt-dir opts))
-  (mapv #(convert-file! config opts %) (paths/pdf-files (:pdf-dir opts))))
+  (mapv (fn [pdf-file]
+          (try
+            (convert-file! config opts pdf-file)
+            (catch Exception e
+              {:status :failed
+               :source-pdf pdf-file
+               :error e})))
+        (or (:pdf-files opts) (paths/pdf-files (:pdf-dir opts)))))

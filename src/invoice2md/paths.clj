@@ -9,10 +9,14 @@
        (str/ends-with? (str/lower-case (.getName file)) ".pdf")))
 
 (defn pdf-files
-  [dir]
-  (->> (file-seq (io/file dir))
+  ([dir]
+   (pdf-files dir false))
+  ([dir recursive?]
+   (->> (if recursive?
+          (file-seq (io/file dir))
+          (or (seq (.listFiles (io/file dir))) []))
        (filter pdf-file?)
-       (sort-by #(.getName %))))
+       (sort-by #(.getPath %)))))
 
 (defn ensure-dir!
   [dir]
