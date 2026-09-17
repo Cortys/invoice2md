@@ -155,6 +155,7 @@ Each field under `fields` extracts one value. By default, regexes are applied to
 - `group`: capture group to use, usually `1`.
 - `type: date`: optional date coercion.
 - `input_format`: Java `DateTimeFormatter` pattern for parsed dates.
+- `input_locale`: optional BCP 47 language tag for parsing dates, for example `en-US` for English month names. Defaults to `de-DE`.
 - `output_format`: Java `DateTimeFormatter` pattern for rendered dates.
 - `target`: extraction target. Defaults to `content`; use `metadata` for PDF metadata.
 - `metadata_key`: metadata field to read when `target: metadata`, for example `keywords`.

@@ -6,14 +6,18 @@
            [java.util.regex Pattern]))
 
 (defn- formatter
-  [pattern]
-  (DateTimeFormatter/ofPattern pattern Locale/GERMANY))
+  ([pattern]
+   (formatter pattern nil))
+  ([pattern locale]
+   (DateTimeFormatter/ofPattern pattern (if locale
+                                         (Locale/forLanguageTag locale)
+                                         Locale/GERMANY))))
 
 (defn- coerce-value
-  [value {:keys [type input_format output_format]}]
+  [value {:keys [type input_format input_locale output_format]}]
   (let [value (str/trim value)]
     (case type
-      "date" (.format (LocalDate/parse value (formatter input_format))
+      "date" (.format (LocalDate/parse value (formatter input_format input_locale))
                       (formatter (or output_format "yyyy-MM-dd")))
       value)))
 

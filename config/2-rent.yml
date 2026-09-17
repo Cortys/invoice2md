@@ -30,12 +30,18 @@ fields:
     group: 1
 
   street_prefix:
-    regex: "(?m)^([A-Za-zÄÖÜäöüß]{3})[A-Za-zÄÖÜäöüß]*\\s+Stra(?:ß|ss)e\\s+[0-9]+(?:\\s+[A-Z])?,\\s+\\d{5}\\s+München"
-    group: 1
+    stages:
+      - regex: "(?m)^([A-Za-zÄÖÜäöüß]{3})[A-Za-zÄÖÜäöüß]*\\s+Stra(?:ß|ss)e\\s+[0-9]+(?:\\s+[A-Z])?,\\s+\\d{5}\\s+München"
+        group: 1
+      - regex: "(?m)^([A-Z][a-z]{2})[0-9]+ /"
+        group: 1
 
   street_number:
-    regex: "(?m)^[A-Za-zÄÖÜäöüß]+\\s+Stra(?:ß|ss)e\\s+([0-9]+(?:\\s+[A-Z])?),\\s+\\d{5}\\s+München"
-    group: 1
+    stages:
+      - regex: "(?m)^[A-Za-zÄÖÜäöüß]+\\s+Stra(?:ß|ss)e\\s+([0-9]+(?:\\s+[A-Z])?),\\s+\\d{5}\\s+München"
+        group: 1
+      - regex: "(?m)^[A-Z][a-z]{2}([0-9]+) /"
+        group: 1
 
 static:
   expense_type: "Hotel"
