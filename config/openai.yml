@@ -43,3 +43,4 @@ markdown: |
   {% for tag in tags %}  - {{tag}}
   {% endfor %}
   ---
+  - [ ] Erstattung erhalten
